@@ -1,29 +1,27 @@
-const express = require("express")
-const { exec } = require('child_process');
+const express = require('express');
+const figlet = require('figlet');
+const app = express();
+const port = 3000;
 
-//const comando = 'touch test.txt';
-//const comando = 'echo "hola mundo" > test.txt';
-//const comando = "ping -c 4 google.com"
-const app = express()
-const port = 3000
+app.use(express.static('public'));
 
-app.use(express.static("public"))
-
-app.get("/", (req,res) => {
-    const comando = "figlet hola mundo"
-    exec(comando, (error, stdout, stderr) => {
-        res.send(`<pre>${stdout}</pre>`)
-      });
-})
-
-app.get("/ping", (req, res) => {
-    const dominio = req.query.dominio
-    const comando = "ping -c 4 " + dominio
-    exec(comando, (error, stdout, stderr) => {
-        res.send(stdout)
+// Endpoint para obtener todas las fuentes
+app.get('/fonts', (req, res) => {
+    figlet.fonts((err, fonts) => {
+        res.json(fonts); 
     });
-})
+});
+
+// Endpoint para convertir texto
+app.get('/convert', (req, res) => {
+    const text = req.query.text || '';
+    const font = req.query.font || 'Standard';
+
+    figlet.text(text, { font: font }, (err, result) => {
+        res.send(result);
+    });
+});
 
 app.listen(port, () => {
-    console.log(`Servidor funcionando en ${port}`)
-})
+    console.log(`Servidor iniciado en http://localhost:${port}`);
+});

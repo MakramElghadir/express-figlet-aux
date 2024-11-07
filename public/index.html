@@ -3,35 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Convertidor de Texto</title>
 </head>
 <body>
-    <h1>Hola mundo</h1>
+    <h1>Convertidor de Texto con Figlet</h1>
 
-    <h2>Ping</h2>
-    <form id="pingForm" action="http://localhost:3000/ping" method="GET">
-        <label for="dominio">Dominio:</label>
-        <input type="text" id="dominio" name="dominio" required>
-        <button type="submit">Enviar</button>
+    <form id="textForm">
+        <label for="text">Texto:</label>
+        <input type="text" id="text" name="text" required>
+        
+        <label for="font">Fuente:</label>
+        <select id="font" name="font"></select>
+        
+        <button type="submit">Convertir</button>
     </form>
-    <p id="respuesta"></p>
+    <pre id="figletOutput"></pre>
 
     <script>
-        document.getElementById('pingForm').onsubmit = function(event) {
-            event.preventDefault(); // Evita el envío del formulario por defecto
-            const dominio = document.getElementById('dominio').value;
-            const url = `http://localhost:3000/ping?dominio=${encodeURIComponent(dominio)}`;
+        // Cargar fuentes en el select
+        fetch('http://localhost:3000/fonts')
+            .then(response => response.json())
+            .then(fonts => {
+                const fontSelect = document.getElementById('font');
+                fonts.forEach(font => {
+                    const option = document.createElement('option');
+                    option.value = font;
+                    option.text = font;
+                    fontSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error cargando fuentes:', error);
+            });
+
+        // Enviar texto y fuente seleccionada al servidor
+        document.getElementById('textForm').onsubmit = function(event) {
+            event.preventDefault();
+
+            const text = document.getElementById('text').value;
+            const font = document.getElementById('font').value;
+            const url = `http://localhost:3000/convert?text=${encodeURIComponent(text)}&font=${encodeURIComponent(font)}`;
 
             fetch(url)
-                .then(response => response.text()) // Cambiado a text() para obtener texto plano
+                .then(response => response.text())
                 .then(data => {
-                    console.log(data)
-                    document.getElementById('respuesta').innerText = 'Respuesta: ' + data; // Mostrar la respuesta
+                    document.getElementById('figletOutput').innerText = data;
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Hubo un error al realizar la solicitud.');
-                });
         };
     </script>
 </body>
