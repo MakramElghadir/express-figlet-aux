@@ -4,13 +4,13 @@ const { exec } = require('child_process');
 //const comando = 'touch test.txt';
 //const comando = 'echo "hola mundo" > test.txt';
 //const comando = "ping -c 4 google.com"
-//const comando = "figlet hola mundo"
 const app = express()
 const port = 3000
 
 app.use(express.static("public"))
 
 app.get("/", (req,res) => {
+    const comando = "figlet hola mundo"
     exec(comando, (error, stdout, stderr) => {
         res.send(`<pre>${stdout}</pre>`)
       });
